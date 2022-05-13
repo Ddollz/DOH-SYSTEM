@@ -443,6 +443,7 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     width: 800px;
     height: 600px;
     text-align: center;
