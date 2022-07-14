@@ -67,25 +67,51 @@ require_once 'include/dbh.inc.php';
             <div class="topic__content">
                 <div class="editor-container" id="new_post">
                     <form action="" id="form_editor">
+                        <?php if (empty($_GET['editId'])) {
+                        ?>
+                            <div class="mb-3">
+                                <label for="Title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="Title" name="Title">
+                            </div>
+                            <div class="mb-3">
+                                <label for="Subtitle" class="form-label">Subtitle</label>
+                                <input type="text" class="form-control" id="Subtitle" name="Subtitle" placeholder="Optional">
+                            </div>
+                            <div id="editor">
+                                <p>Hello World!</p>
+                                <p>Some initial <strong>bold</strong> text</p>
+                                <p><br></p>
+                            </div>
+                        <?php
+                        } else {
 
-                        <div class="mb-3">
-                            <label for="Title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="Title" name="Title">
-                        </div>
-                        <div class="mb-3">
-                            <label for="Subtitle" class="form-label">Subtitle</label>
-                            <input type="text" class="form-control" id="Subtitle" name="Subtitle" placeholder="Optional">
-                        </div>
-                        <div id="editor">
-                            <p>Hello World!</p>
-                            <p>Some initial <strong>bold</strong> text</p>
-                            <p><br></p>
-                        </div>
+                            $sql = 'SELECT * FROM discussion_records WHERE discussion_id  = ?';
+                            $stmt = $pdo->prepare($sql);
+                            $stmt->execute([$_GET['editId']]);
+                            $topic = $stmt->fetch();
+
+                        ?>
+                            <div class="mb-3">
+                                <label for="Title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="Title" name="Title" value="<?php echo $topic['discussion_title'] ?>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="Subtitle" class="form-label">Subtitle</label>
+                                <input type="text" class="form-control" id="Subtitle" name="Subtitle" placeholder="Optional" value="<?php echo $topic['discussion_subtitle'] ?>">
+                            </div>
+                            <div id="editor">
+                            </div>
+                        <?php
+                        }
+                        ?>
                         <button class="btn button-primary float-end mt-3 px-4 py-2" type="submit">Submit</button>
                     </form>
                 </div>
                 <div class="display-container" id="content">
                     <div class="main__content">
+                        <div id="author">
+
+                        </div>
                         <h3 id="content__title">
                         </h3>
                         <h5 id="content__subtitle">
@@ -109,6 +135,7 @@ require_once 'include/dbh.inc.php';
             </div>
         </div>
     </div>
+
 </main>
 <?php
 include 'include/footer.inc.php';
@@ -207,6 +234,8 @@ include 'include/footer.inc.php';
             // console.log(typeof delta);
             Form.append($('<input>').attr('type', 'hidden').attr('value', JSON.stringify(delta)).attr('name', 'delta'));
 
+            let valueEdit = '<?php echo (isset($_GET['editId'])) ? $_GET['editId'] : 'none'; ?>';
+            Form.append($('<input>').attr('type', 'hidden').attr('value', valueEdit).attr('name', 'editID'));
             $.ajax({
                 type: 'POST',
                 url: 'include/discussion-include/editor.inc.php',
@@ -217,19 +246,52 @@ include 'include/footer.inc.php';
                     console.log(data.error);
                     return;
                 }
-                location.reload();
 
+                <?php if (empty($_GET['editId'])) {
+                ?>
+                    location.reload();
+                <?php
+                } else { ?>
+                    window.location.replace("system-discussion.php");
+                <?php
+                } ?>
             }).fail(function(res) {
-                console.log("There are some errors upon posting");
+                console.log(res);
             })
 
         });
 
-        changeTopic($("tbody tr:first-child").attr("id"));
-        $("#new_Topic").click(function() {
+
+        <?php if (empty($_GET['editId'])) {
+        ?>
+            changeTopic($("tbody tr:first-child").attr("id"));
+            $('.editor-container').css('display') == 'none';
+        <?php
+        } else { ?>
             toggleDisplayTopic();
-            console.log("haha")
+            <?php
+            $sql = 'SELECT * FROM discussion_records WHERE discussion_id  = ?';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$_GET['editId']]);
+            $topic = $stmt->fetch();
+            ?>
+            editor.setContents(<?php echo $topic['discussion_content'] ?>);
+
+        <?php
+        } ?>
+        $("#new_Topic").click(function() {
+
+            <?php if (empty($_GET['editId'])) {
+            ?>
+                toggleDisplayTopic();
+            <?php
+            } else { ?>
+                window.location.replace("system-discussion.php");
+            <?php
+            } ?>
         });
+
+
 
         $("#topicTable").on("click", 'tr', function() {
             let curID = $(this).attr("id");
@@ -243,11 +305,25 @@ include 'include/footer.inc.php';
                 delta = JSON.parse(delta);
                 // console.log(delta.topic);
                 // console.log(delta.comments);
+                // console.log(delta.author);
                 if (delta.error) {
                     console.log(delta.error);
                     return;
                 }
                 toggleDisplayTopic(true, curID);
+                let AuthorDiv = `
+                                <div class="d-flex flex-row justify-content-between">
+                                    <div>
+                                        <div class="name">${delta.author.firstname} ${delta.author.lastname}</div>
+                                        <p class="time_reply">on <span>${delta.topic.date_upload}</span></p>
+                                        
+                                    </div>
+                                    <a type="button" href="system-discussion.php?editId=${delta.topic.discussion_id}" class="btn button-primary edit-button"><i class="bi bi-pencil-square"></i></a>
+                                </div>
+                                `;
+                $("#author").html(AuthorDiv);
+
+
                 $("#content__title").html(delta.topic.discussion_title);
                 $("#content__subtitle").html(delta.topic.discussion_subtitle);
                 $("#topicID").val(delta.topic.discussion_id);
@@ -324,8 +400,8 @@ include 'include/footer.inc.php';
 
         });
         $(".reply__container").on('click', '.reply__c button', function(e) {
-            
-            var quill = new Quill("#"+$(this).attr('content-comment'), {
+
+            var quill = new Quill("#" + $(this).attr('content-comment'), {
                 theme: 'snow',
                 readOnly: true,
                 modules: {
@@ -334,7 +410,7 @@ include 'include/footer.inc.php';
             });
             console.log(quill.getContents());
             replyEditor.insertEmbed(0, 'blockquote', '');
-            replyEditor.insertText(0,quill.getText().replace(/\n$/, ''));
+            replyEditor.insertText(0, quill.getText().replace(/\n$/, ''));
         });
 
     });

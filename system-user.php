@@ -61,7 +61,7 @@ require_once 'include/dbh.inc.php';
                                 <th>
                                     Added By
                                 </th>
-                                
+
                                 <th>
                                     Documents
                                 </th>
@@ -122,11 +122,11 @@ require_once 'include/dbh.inc.php';
                                         $stmt = $pdo->prepare($sql);
                                         $stmt->execute([$patient['added_by']]);
                                         $clinician = $stmt->fetch();
-                                        echo $clinician['firstname']." ".$clinician['lastname'];
+                                        echo $clinician['firstname'] . " " . $clinician['lastname'];
                                         ?>
                                     </td>
                                     <td>
-                                        <a href="system-ocr.php?patient=<?php echo $patient['user_id']?>" class="btn button-primary">Upload Documents</a>
+                                        <a href="system-ocr.php?patient=<?php echo $patient['user_id'] ?>" class="btn button-primary">Upload Documents</a>
                                     </td>
                                 </tr>
                             <?php
@@ -209,6 +209,13 @@ include 'include/footer.inc.php';
                     content__fresh();
                     page__content.style.display = "block";
                     element.classList.add("active");
+                }
+
+                if (element.getAttribute('page') !== "patients") {
+                    $('#Add-Record').hide();
+                }else{
+                    $('#Add-Record').show();
+
                 }
             });
         });

@@ -14,6 +14,12 @@ if (isset($_POST['id'])) {
     }
     
 
+    $sql = 'SELECT * FROM clinician_details WHERE user_id  = ?';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$topic['user_id']]);
+    $author = $stmt->fetch();
+
+
     $sql = 'SELECT * FROM discussion_comments WHERE discussion_id  = ?';
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$_POST['id']]);
@@ -34,7 +40,8 @@ if (isset($_POST['id'])) {
 
     echo json_encode([
         'topic' => $topic,
-        'comments' => $commentList
+        'comments' => $commentList,
+        'author' => $author
     ]);
 } else {
     echo json_encode(['error' => 'There is no existing topic']);

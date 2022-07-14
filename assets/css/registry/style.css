@@ -627,6 +627,23 @@ main {
     /* Hide vertical scrollbar */
 }
 
+#author .name {
+    font-family: "pro-b", sans-serif;
+    font-size: 1.2em;
+    padding: 0;
+    margin: 0;
+}
+#author .time_reply{
+    margin: 0;
+}
+#author .time_reply span {
+    font-weight: bold;
+}
+#author .edit-button{
+    font-size: 2em;
+    background-color: transparent;
+    color: black;
+}
 #content__display {
     border: none;
 }
