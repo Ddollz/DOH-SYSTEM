@@ -101,7 +101,7 @@ require_once 'include/dbh.inc.php';
                                                 <!-- With Blob Upload -->
                                                 <!-- <div><a target="_blank" href="include/download.inc.php?id=<?php echo $document['record_id']; ?>"><?php echo $document['file_name']; ?></a></div> -->
                                                 <!-- With Local Upload -->
-                                                <div><a target="_blank" href="media/uploads/<?php echo $document['file_name']; ?>" download><?php echo $document['file_name']; ?></a></div>
+                                                <div><a target="_blank" href="media/uploads/<?php echo $document['user_id']."/".$document['file_name']; ?>" download><?php echo $document['file_name']; ?></a></div>
 
                                                 <div>10:39am</div>
                                             </div>
