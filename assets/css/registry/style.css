@@ -119,7 +119,8 @@ main {
     outline: var(--c-dark);
 
 }
-.button-primary:active{
+
+.button-primary:active {
     transform: translateY(-4px);
     transition: transform 0.02s;
 }
@@ -138,10 +139,11 @@ main {
     outline: var(--c-dark);
 }
 
-.button-outline-primary:active{
+.button-outline-primary:active {
     transform: translateY(-4px);
     transition: transform 0.02s;
 }
+
 .content {
     margin-inline: auto;
     width: min(60%, 70.5rem);
@@ -248,9 +250,9 @@ main {
     width: 100%;
 }
 
-/* .nav-item {
-    margin-top: 16px;
-} */
+.nav-item {
+    position: relative;
+}
 
 .nav-item a {
     font-size: 20px;
@@ -265,6 +267,27 @@ main {
     color: var(--c-dark);
 
 }
+
+
+.tooltiptext {
+    visibility: hidden;
+    width: 150px;
+    background-color: var(--c-white);
+    color: var(--c-dark);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    border: var(--black5) 1px solid;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.nav-item:hover .tooltiptext {
+    visibility: visible;
+}
+
 
 .profile {
     width: 100%;
@@ -633,17 +656,21 @@ main {
     padding: 0;
     margin: 0;
 }
-#author .time_reply{
+
+#author .time_reply {
     margin: 0;
 }
+
 #author .time_reply span {
     font-weight: bold;
 }
-#author .edit-button{
+
+#author .edit-button {
     font-size: 2em;
     background-color: transparent;
     color: black;
 }
+
 #content__display {
     border: none;
 }
@@ -805,7 +832,6 @@ input.dt-button {
     box-shadow: none;
 }
 
-#patientTable{
+#patientTable {
     cursor: pointer;
 }
-

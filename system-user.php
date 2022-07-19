@@ -22,9 +22,9 @@ require_once 'include/dbh.inc.php';
                 Clinicians
             </div>
 
-            <div class="ms-auto d-flex justify-content-center align-items-center me-5" id="button-for-table">
+            <!-- <div class="ms-auto d-flex justify-content-center align-items-center me-5" id="button-for-table">
                 <button class="btn button-primary px-4 py-2" id="Add-Record">Add Record</button>
-            </div>
+            </div> -->
         </div>
         <div class="middle__content">
             <div class="m__page" id="patients">
@@ -73,7 +73,8 @@ require_once 'include/dbh.inc.php';
                             $sql = 'SELECT * FROM patient_details ORDER BY added_date DESC';
                             $stmt = $pdo->prepare($sql);
                             $stmt->execute();
-                            while ($patient = $stmt->fetch()) {
+                            $row = $stmt->fetchAll();
+                            foreach ($row as $patient) {
                             ?>
                                 <tr id="<?php echo $patient['user_id'] ?>">
                                     <td>
@@ -147,10 +148,10 @@ require_once 'include/dbh.inc.php';
                                 </th>
 
                                 <th>
-                                    Name
+                                    Email
                                 </th>
                                 <th>
-                                    Email
+                                    Name
                                 </th>
                                 <th>
                                     Practice
@@ -191,7 +192,18 @@ include 'include/footer.inc.php';
 </body>
 <script>
     $(document).ready(function() {
-        patientTable = $('#patientTable').DataTable();
+        patientTable = $('#patientTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [{
+                text: 'Add Record',
+                attr: {
+                    class: 'btn button-primary px-4 py-2',
+                },
+                action: function(e, dt, node, config) {
+                    $("#exampleModal").modal('show');
+                }
+            }]
+        });
         clinicianTable = $('#clinicianTable').DataTable();
         loadClinicianTable();
 
@@ -211,12 +223,12 @@ include 'include/footer.inc.php';
                     element.classList.add("active");
                 }
 
-                if (element.getAttribute('page') !== "patients") {
-                    $('#Add-Record').hide();
-                }else{
-                    $('#Add-Record').show();
+                // if (element.getAttribute('page') !== "patients") {
+                //     $('#Add-Record').hide();
+                // } else {
+                //     $('#Add-Record').show();
 
-                }
+                // }
             });
         });
 
@@ -251,10 +263,6 @@ include 'include/footer.inc.php';
                 });
         });
 
-        $("#Add-Record").click(function() {
-            console.log("hello");
-            $("#exampleModal").modal('show');
-        })
 
         function calculateBMI() {
 
@@ -273,6 +281,20 @@ include 'include/footer.inc.php';
             calculateBMI();
         });
 
+        $("#bday").change(function() {
+            $('#Age').val(getAge($('#bday').val()))
+        });
+
+        function getAge(dateString) {
+            var today = new Date();
+            var birthDate = new Date(dateString);
+            var age = today.getFullYear() - birthDate.getFullYear();
+            var m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
 
         $("#patientForm").on('submit', function(e) {
             e.preventDefault();
